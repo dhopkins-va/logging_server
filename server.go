@@ -6,7 +6,7 @@ import (
 	"net"
 	"strings"
 	"os"
-	"customLogger"
+	"./customLogger"
 )
 
 func init() {
@@ -17,12 +17,14 @@ func init() {
 		fmt.Println("Logs folder created")
 	}
 
+	logger := customLogger.GetInstance()
+	logger.Println("Init complete")
 }
 
 
 func main() {
 
-	logger := cus
+	logger := customLogger.GetInstance()
 
 	// Create server
 	li, err := net.Listen("tcp", ":1902")
@@ -30,15 +32,18 @@ func main() {
 		panic(err)
 	}
 
+	logger.Println("Server listening...")
+
 	defer li.Close()
 	// Handle incoming connections
 	for {
 
 		conn, err := li.Accept()
 		if err != nil {
-			logs.Fatalln(err)
+			logger.Fatalln(err)
 		}
 
+		logger.Println("Connection received")
 		go handle(conn)
 	}
 }
@@ -49,27 +54,22 @@ func handle(conn net.Conn) {
 
 	for scanner.Scan() {
 		message := scanner.Text()
-		project := strings.Split(message, " ")[0]
-		writeLogs(project, message)
+		fname := strings.Split(message, " ")[0]
+		fname+= ".txt"
+		writeLogs(fname, message)
 	}
 
 	defer conn.Close()
 }
 
-func writeLogs(project string, message string) {
+func writeLogs(fname string, message string) {
 
-	_, err := os.Stat("./logs/" + project + "/" + project + ".log")
-	if err != nil {
-		if os.IsNotExist(err) {
-			createLogFile(project)
-		} else {
-			fmt.Println("Error checking if logs already exist")
-		}
-	}
 
-	file, err := os.OpenFile("./logs/" + project + "/" + project + ".log", os.O_APPEND|os.O_WRONLY, 0600)
+	logger := customLogger.GetInstance()
+
+	file, err := os.OpenFile("./logs/" + fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println("Error opening file for write.")
+		logger.Println("Error opening file for write.")
 	}
 	defer file.Close()
 
@@ -77,15 +77,4 @@ func writeLogs(project string, message string) {
 		fmt.Println("Error writing to file")
 	}
 
-}
-
-func createLogFile(project string) {
-
-	os.Mkdir("./logs/" + project, os.ModePerm)
-	file, err := os.Create("./logs/" + project + "/" + project + ".log")
-	if err != nil {
-		fmt.Println(err)
-	}
-	logs.Println("New project created")
-	file.Close()
 }

@@ -1,4 +1,4 @@
-package logging
+package customLogger
 
 import (
 	"log"
@@ -26,7 +26,7 @@ func GetInstance() *logger {
 
 func createLogger(fname string) *logger {
 
-	file, _ := os.OpenFile("./logs/" + fname, os.O_RDWR|os.O_APPEND|os.O_TRUNC, 0777)
+	file, _ := os.OpenFile("./logs/" + fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 	return &logger{
 		filename: fname,
