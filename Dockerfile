@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM tinywarrior/logging_server
 RUN mkdir /app
 ADD . /app
 WORKDIR /app
