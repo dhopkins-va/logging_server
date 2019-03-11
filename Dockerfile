@@ -1,4 +1,4 @@
-FROM tinywarrior/logging_server
+FROM tinywarrior/alpine_go
 RUN mkdir /app
 ADD . /app
 WORKDIR /app
