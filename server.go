@@ -55,7 +55,7 @@ func handle(conn net.Conn) {
 	for scanner.Scan() {
 		message := scanner.Text()
 		fname := strings.Split(message, " ")[0]
-		fname+= ".txt"
+		fname+= ".log"
 		writeLogs(fname, message)
 	}
 
