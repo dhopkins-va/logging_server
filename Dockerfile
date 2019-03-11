@@ -1,4 +1,4 @@
-FROM tinywarrior/alpine_go:v0.1
+FROM golang:latest
 RUN mkdir /app
 ADD . /app
 WORKDIR /app
