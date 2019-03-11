@@ -74,7 +74,7 @@ func writeLogs(fname string, message string) {
 	defer file.Close()
 
 	if _, err := file.WriteString(message + "\n"); err != nil{
-		fmt.Println("Error writing to file")
+		logger.Println("Error writing to file")
 	}
 
 }
