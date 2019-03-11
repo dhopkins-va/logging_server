@@ -2,14 +2,27 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"bufio"
 	"net"
 	"strings"
 	"os"
+	"customLogger"
 )
 
+func init() {
+
+	// Create log folder
+	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
+		os.Mkdir("./logs", os.ModePerm)
+		fmt.Println("Logs folder created")
+	}
+
+}
+
+
 func main() {
+
+	logger := cus
 
 	// Create server
 	li, err := net.Listen("tcp", ":1902")
@@ -18,20 +31,12 @@ func main() {
 	}
 
 	defer li.Close()
-
-
-	// Create the logs folder if it doesn't exist
-
-	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
-		os.Mkdir("./logs", os.ModePerm)
-		fmt.Println("Logs folder created")
-	}
 	// Handle incoming connections
 	for {
 
 		conn, err := li.Accept()
 		if err != nil {
-			log.Fatalln(err)
+			logs.Fatalln(err)
 		}
 
 		go handle(conn)
@@ -81,6 +86,6 @@ func createLogFile(project string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("New project created")
+	logs.Println("New project created")
 	file.Close()
 }
