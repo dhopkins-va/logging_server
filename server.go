@@ -19,6 +19,13 @@ func main() {
 
 	defer li.Close()
 
+
+	// Create the logs folder if it doesn't exist
+
+	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
+		os.Mkdir("./logs", os.ModePerm)
+		fmt.Println("Logs folder created")
+	}
 	// Handle incoming connections
 	for {
 
