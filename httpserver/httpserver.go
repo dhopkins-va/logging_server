@@ -3,17 +3,30 @@ package httpserver
 import (
 	"net/http"
 	"io/ioutil"
+	"time"
 
 	"github.com/tinywarrior/logging_server/logger"
 	"github.com/julienschmidt/httprouter"
 )
 
-var logMessage  *logger.Log
+var logMessage *logger.Log
+
+func init() {
+
+	logMessage = &logger.Log{
+		Service: "HTTP Server",
+		Time: time.Now(),
+		RemoteServer: "",
+		Message: "",
+	}
+}
 
 func LaunchHTTPServer() {
 
 	mux := httprouter.New()
+	logMessage.GenerateLogMessage("Starting HTTP server...")
 	mux.POST("/write", writeLogs)
+	logMessage.GenerateLogMessage("HTTP Server started")
 	http.ListenAndServe(":8080", mux)
 }
 

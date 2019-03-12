@@ -3,7 +3,7 @@ package tcpserver
 import (
 	"net"
 	"bufio"
-	"fmt"
+	"time"
 
 	"github.com/tinywarrior/logging_server/logger"
 )
@@ -12,8 +12,12 @@ var logMessage *logger.Log
 
 func init() {
 
-	logMessage.Service = "HTTPServer"
-	logMessage.RemoteServer = "Local Server"
+	logMessage = &logger.Log{
+		Service: "TCP Server",
+		Time: time.Now(),
+		RemoteServer: "",
+		Message: "",
+	}
 }
 
 func LaunchTCPServer() {
@@ -28,7 +32,7 @@ func LaunchTCPServer() {
 	for {
 		conn, err := li.Accept()
 		if err != nil {
-			fmt.Println(err)
+			logMessage.GenerateErrorMessage(err)
 		}
 
 		go handleTCPConnections(conn)
@@ -45,7 +49,6 @@ func handleTCPConnections(conn net.Conn) {
 	var log *logger.Log
 	for scanner.Scan() {
 		message := scanner.Text()
-		fmt.Println(message)
 		log = logger.JsonUnmarshall([]byte(message))
 		logger.WriteToFile(log)
 		logMessage.GenerateLogMessage("Logs written successfully")
