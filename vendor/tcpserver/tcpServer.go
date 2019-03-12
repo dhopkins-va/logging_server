@@ -5,7 +5,7 @@ import (
 	"bufio"
 	"time"
 
-	"github.com/tinywarrior/logging_server/logger"
+	"logger"
 )
 
 var logMessage *logger.Log

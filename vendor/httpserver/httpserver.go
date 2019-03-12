@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"time"
 
-	"github.com/tinywarrior/logging_server/logger"
+	"logger"
 	"github.com/julienschmidt/httprouter"
 )
 
