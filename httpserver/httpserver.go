@@ -3,11 +3,12 @@ package httpserver
 import (
 	"net/http"
 	"io/ioutil"
-	"fmt"
 
 	"github.com/tinywarrior/logging_server/logger"
 	"github.com/julienschmidt/httprouter"
 )
+
+var logMessage  *logger.Log
 
 func LaunchHTTPServer() {
 
@@ -17,23 +18,20 @@ func LaunchHTTPServer() {
 }
 
 func writeLogs(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
-
-	// logger := GetInstance()
-
 	
 	body, err := ioutil.ReadAll(req.Body)
 	defer req.Body.Close()
 	if err != nil {
-		// logger.Println(err)
+		logMessage.GenerateErrorMessage(err)
 	}
-	// logger.Println("Parsing message body")
+	logMessage.GenerateLogMessage("Parsing message body")
 	var log *logger.Log
 
 	
 	// log.RemoteServer = strings.Split(req.RemoteAddr, ":")[0]
 	log = logger.JsonUnmarshall(body)
 
-	fmt.Println("Writing to file")
+	logMessage.GenerateLogMessage("Writing to file")
 	logger.WriteToFile(log)
 
 	res.Header().Set("Content-Type", "application/json")

@@ -29,6 +29,21 @@ func JsonUnmarshall(input []byte) (log *Log) {
 	
 }
 
+func (log *Log) GenerateErrorMessage(err error) {
+
+	log.Time = time.Now()
+	log.Message = err.Error()
+
+	WriteToFile(log)
+}
+
+func (log *Log) GenerateLogMessage(message string) {
+
+	log.Time = time.Now()
+	log.Message = message
+
+	WriteToFile(log)
+}
 
 func WriteToFile(log *Log) {
 
