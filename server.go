@@ -56,7 +56,7 @@ func writeLogs(res http.ResponseWriter, req *http.Request, params httprouter.Par
 func writeToFile(log Log) {
 
 	fname := log.Service
-	file, err := os.OpenFile("./logs/" + fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile("./logs/" + fname + ".log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("Error opening file for write.")
 	}
