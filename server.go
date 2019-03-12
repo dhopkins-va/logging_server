@@ -7,10 +7,39 @@ import (
 	"os"
 	"time"
 	"strings"
-	"./customLogger"
+	"log"
+	"sync"
 
 	"github.com/julienschmidt/httprouter"
 )
+
+type logger struct {
+    filename string
+    *log.Logger
+}
+
+var customLogger *logger
+var once sync.Once
+
+// start logging
+func GetInstance() *logger {
+
+	once.Do(func() {
+		customLogger = createLogger("server.log")
+	})
+
+	return customLogger
+}
+
+func createLogger(fname string) *logger {
+
+	file, _ := os.OpenFile("./logs/" + fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	return &logger{
+		filename: fname,
+		Logger: log.New(file, "Server: ", log.Lshortfile|log.LstdFlags),
+	}
+}
 
 type Log struct {
 
@@ -23,7 +52,7 @@ type Log struct {
 
 func main() {
 
-	logger := customLogger.GetInstance()
+	logger := GetInstance()
 	logger.Println("Starting server...")
 	mux := httprouter.New()
 	mux.POST("/write", writeLogs)
@@ -36,7 +65,7 @@ func main() {
 
 func writeLogs(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 
-	logger := customLogger.GetInstance()
+	logger := GetInstance()
 
 	body, err := ioutil.ReadAll(req.Body)
 	defer req.Body.Close()
@@ -62,7 +91,7 @@ func writeLogs(res http.ResponseWriter, req *http.Request, params httprouter.Par
 
 func writeToFile(log Log) {
 
-	logger := customLogger.GetInstance()
+	logger := GetInstance()
 
 	fname := log.Service
 	file, err := os.OpenFile("./logs/" + fname + ".log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
