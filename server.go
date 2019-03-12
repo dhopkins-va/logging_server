@@ -2,12 +2,12 @@ package main
 
 import (
 	"net/http"
-	"fmt"
 	"io/ioutil"
 	"encoding/json"
 	"os"
 	"time"
 	"strings"
+	"./customLogger"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -23,29 +23,36 @@ type Log struct {
 
 func main() {
 
+	logger := customLogger.GetInstance()
+	logger.Println("Starting server...")
 	mux := httprouter.New()
 	mux.POST("/write", writeLogs)
+	logger.Println("Server started")
 	http.ListenAndServe(":8080", mux)
+	
 }
 
 
 
 func writeLogs(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 
+	logger := customLogger.GetInstance()
+
 	body, err := ioutil.ReadAll(req.Body)
 	defer req.Body.Close()
 	if err != nil {
-		fmt.Println(err)
+		logger.Println(err)
 	}
-
+	logger.Println("Parsing message body")
 	var log Log
-	fmt.Printf("%T", req.RemoteAddr)
+
 	log.RemoteServer = strings.Split(req.RemoteAddr, ":")[0]
 	err = json.Unmarshal(body, &log)
 	if err != nil {
-		fmt.Println(err)
+		logger.Println(err)
 	}
 
+	logger.Println("Writing to file")
 	writeToFile(log)
 
 	res.Header().Set("Content-Type", "application/json")
@@ -55,19 +62,21 @@ func writeLogs(res http.ResponseWriter, req *http.Request, params httprouter.Par
 
 func writeToFile(log Log) {
 
+	logger := customLogger.GetInstance()
+
 	fname := log.Service
 	file, err := os.OpenFile("./logs/" + fname + ".log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println("Error opening file for write.")
+		logger.Println("Error opening file for write.")
 	}
 	defer file.Close()
 
 	message, err := json.Marshal(log)
 	if err != nil {
-		fmt.Println(err)
+		logger.Println(err)
 	}
 	if _, err := file.WriteString(string(message[:]) + "\n"); err != nil{
-		fmt.Println("Error writing to file")
+		logger.Println("Error writing to file")
 	}
 
 }
