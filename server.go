@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"net"
 	"io/ioutil"
 	"encoding/json"
 	"os"
@@ -9,6 +10,8 @@ import (
 	"strings"
 	"log"
 	"sync"
+	"bufio"
+	"fmt"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -57,11 +60,49 @@ func main() {
 	mux := httprouter.New()
 	mux.POST("/write", writeLogs)
 	logger.Println("Server started")
+	go launchTCPServer()
 	http.ListenAndServe(":8080", mux)
+
+	
 	
 }
 
 
+func launchTCPServer() {
+
+	logger := GetInstance()
+
+	logger.Println("Starting tcp server...")
+	li, err := net.Listen("tcp", ":1903")
+	if err != nil {
+		logger.Println(err)
+	}
+	defer li.Close()
+
+	for {
+		conn, err := li.Accept()
+		if err != nil {
+			logger.Println(err)
+		}
+
+		logger.Println("Listening for connections...")
+		go handleTCPConnections(conn)
+	}
+
+}
+
+func handleTCPConnections(conn net.Conn) {
+
+	scanner := bufio.NewScanner(conn)
+
+	for scanner.Scan() {
+		message := scanner.Text()
+		fmt.Println(message)
+	}
+
+	defer conn.Close()
+
+}
 
 func writeLogs(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 
