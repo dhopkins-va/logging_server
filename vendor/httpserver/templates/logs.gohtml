@@ -1,0 +1,11 @@
+{{ template "header" }}
+
+{{ range . }}
+    {{ .Filename }}
+    <br>
+    {{ range .AllLogs }}
+        {{ . }}
+        <br>
+    {{ end }}
+    <br>
+{{ end }}

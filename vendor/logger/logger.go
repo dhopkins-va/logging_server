@@ -21,7 +21,7 @@ func JsonUnmarshall(input []byte) (log *Log) {
 	var unMarshalledLog *Log
 	err := json.Unmarshal(input, &unMarshalledLog)
 	if err != nil {
-		fmt.Println("Error marshalling json")
+		fmt.Println("Error unmarshalling json")
 		fmt.Println(err)
 	}
 
